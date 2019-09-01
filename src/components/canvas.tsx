@@ -1,16 +1,17 @@
-import React, { Component } from "react";
+import React, { Component, CSSProperties } from "react";
 import { CanvasContext, CanvasContextProvider } from "./context";
 
 interface CanvasPropsI {
   height: number;
   width: number;
-  context?: (ctx: CanvasRenderingContext2D) => void;
+  name: string;
+  style?: CSSProperties;
 }
 interface CanvasStateI {
   height: number;
   width: number;
 }
-export class Canvas extends Component<CanvasPropsI, CanvasStateI> {
+export class Canvas extends Component<CanvasPropsI, any> {
   contextValue?: CanvasContext;
   container?: any;
 
@@ -19,10 +20,15 @@ export class Canvas extends Component<CanvasPropsI, CanvasStateI> {
     this.bindContainer = this.bindContainer.bind(this);
     this.updateCanvas = this.updateCanvas.bind(this);
     this.clearCanvas = this.clearCanvas.bind(this);
+    this.applyCSSStyles = this.applyCSSStyles.bind(this);
+    this.setClassName = this.setClassName.bind(this);
+    this.state = {
+      refresh: false
+    };
   }
 
   componentDidMount(): void {
-    const { width, height } = this.props;
+    const { width, height, name } = this.props;
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
@@ -32,6 +38,8 @@ export class Canvas extends Component<CanvasPropsI, CanvasStateI> {
       clearCanvas: this.clearCanvas,
       canvas: canvas
     };
+    this.setClassName();
+    this.applyCSSStyles();
     this.container.appendChild(canvas);
 
     this.forceUpdate();
@@ -41,6 +49,22 @@ export class Canvas extends Component<CanvasPropsI, CanvasStateI> {
     if (this.contextValue) {
       const { width, height } = this.contextValue.canvas;
       this.contextValue.ctx.clearRect(0, 0, width, height);
+    }
+  }
+
+  applyCSSStyles() {
+    if (this.contextValue && this.props.style) {
+      const styleString = Object.entries(this.props.style)
+        .map(([cssAttr, cssValue]) => `${cssAttr}: ${cssValue};`)
+        .join(" ");
+      this.contextValue.canvas.setAttribute("style", styleString);
+    }
+  }
+
+  setClassName() {
+    if (this.contextValue) {
+      const canvas = this.contextValue.canvas;
+      canvas.setAttribute("class", `${this.props.name}-canvas`);
     }
   }
 
@@ -62,6 +86,9 @@ export class Canvas extends Component<CanvasPropsI, CanvasStateI> {
     if (!this.contextValue) return;
     const canvas = this.contextValue.canvas;
     const ctx = this.contextValue.ctx;
+    if (fromProps.name !== toProps.name) {
+      canvas.setAttribute("class", toProps.name);
+    }
     if (
       fromProps.width !== toProps.width ||
       fromProps.height !== toProps.height
@@ -69,11 +96,15 @@ export class Canvas extends Component<CanvasPropsI, CanvasStateI> {
       canvas.width = toProps.width;
       canvas.height = toProps.height;
     }
+    this.applyCSSStyles();
   }
 
   render() {
     return (
-      <div ref={this.bindContainer}>
+      <div
+        ref={this.bindContainer}
+        className={`canvas-wrapper ${this.props.name}-canvas-wrapper`}
+      >
         {this.contextValue ? (
           <CanvasContextProvider value={this.contextValue}>
             {this.props.children}
