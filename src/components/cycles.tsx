@@ -2,11 +2,10 @@ import React, { useEffect, useMemo } from "react";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import Arc from "./arc";
 import { useCanvasContext } from "./context";
-import { AnimatedCycle } from "./animated-cycle";
 
 export function Cycles() {
   const dim = useWindowDimensions();
-  const { ctx, canvas, clearCanvas } = useCanvasContext();
+  const { clearCanvas } = useCanvasContext();
 
   function initCycles() {
     const cyclesCount = 5;

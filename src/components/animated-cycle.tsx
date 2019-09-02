@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Arc from "./arc";
 import {
-  Frame,
-  useRequestAnimationFrame
-} from "../hooks/useRequestAnimationFrame";
-import { useCanvasContext } from "./context";
+  RequestAnimationFrame,
+  useRequestedAnimationFrameContext
+} from "./request-animation-frame";
+import Arc from "./arc";
 
-export function AnimatedCycle() {
-  const { clearCanvas } = useCanvasContext();
+export function AnimatedArc({ factor }: any) {
+  const { time, cancelAnimationFrame } = useRequestedAnimationFrameContext();
   const [cycle, setCycle] = useState({
     x: 0,
     y: 0,
@@ -15,27 +14,32 @@ export function AnimatedCycle() {
     startAngle: 0,
     endAngle: Math.PI
   });
-  const frame: any = useRequestAnimationFrame((requestedFrame: Frame) => {
-    const { time } = requestedFrame;
-    clearCanvas();
+  //if (time > 4000) cancelAnimationFrame();
+
+  useEffect(() => {
     setCycle({
-      x: time / 100,
+      x: (time / 100) * factor,
       y: 0,
       radius: 50,
       startAngle: 0,
       endAngle: Math.PI
     });
-  });
+  }, [time]);
 
-  useEffect(() => {}, [frame]);
+  return <Arc {...cycle} />;
+}
 
+export function AnimatedCycle() {
   return (
-    <Arc
-      endAngle={cycle.endAngle}
-      startAngle={cycle.startAngle}
-      radius={cycle.radius}
-      y={cycle.y}
-      x={cycle.x}
-    />
+    <RequestAnimationFrame>
+      {(time: number, clearAnimationFrame: () => void) => {
+        return (
+          <>
+            <AnimatedArc factor={1.2} />
+            <AnimatedArc factor={1} />
+          </>
+        );
+      }}
+    </RequestAnimationFrame>
   );
 }
