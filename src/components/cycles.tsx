@@ -8,24 +8,25 @@ export function Cycles() {
   const { clearCanvas } = useCanvasContext();
 
   function initCycles() {
-    const cyclesCount = 5;
-    const res = [];
+    const numOfCycles = 5;
+    const cycles: any[] = [];
     const radius = 30;
-    for (let u = 0; u < cyclesCount; u++) {
-      for (let v = 0; v < cyclesCount; v++) {
-        const x = Math.floor((dim.width / cyclesCount) * u + radius);
-        const y = Math.floor((dim.height / cyclesCount) * v + radius);
-        res.push({
+    for (let u = 0; u < numOfCycles; u++) {
+      for (let v = 0; v < numOfCycles; v++) {
+        const x = (dim.width / numOfCycles) * u + radius;
+        const y = (dim.height / numOfCycles) * v + radius;
+        const cycle = {
           x,
           y,
           radius,
           startAngle: 0,
           endAngle: 2 * Math.PI
-        });
+        };
+        cycles.push(cycle);
       }
     }
 
-    return res;
+    return cycles;
   }
   const cycles = useMemo(initCycles, [dim.height, dim.width]);
 

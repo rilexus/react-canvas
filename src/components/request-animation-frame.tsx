@@ -24,15 +24,15 @@ export function RequestAnimationFrame({ children }: any) {
   const frameIDRef = useRef(-1);
   function requestFrame(t: number) {
     frameIDRef.current = requestAnimationFrame(requestFrame);
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     setTime(t);
   }
-  function cancelAnimation() {
-    cancelAnimationFrame(frameIDRef.current);
-  }
+  const cancelAnimation = () => cancelAnimationFrame(frameIDRef.current);
 
   useEffect(() => {
-    requestFrame(0);
+    requestAnimationFrame(requestFrame);
+    return cancelAnimation;
   }, []);
 
   return (

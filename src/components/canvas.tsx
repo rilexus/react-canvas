@@ -11,16 +11,20 @@ interface CanvasStateI {
   height: number;
   width: number;
 }
+
+/**
+ * mounts HTMLCanvasElement in to the DOM and passes its context to own children
+ */
 export class Canvas extends Component<CanvasPropsI, any> {
   contextValue?: CanvasContext;
-  container?: any;
+  container?: HTMLElement;
 
   constructor(props: any) {
     super(props);
-    this.bindContainer = this.bindContainer.bind(this);
+    this.bindCanvasContainer = this.bindCanvasContainer.bind(this);
     this.updateCanvas = this.updateCanvas.bind(this);
     this.clearCanvas = this.clearCanvas.bind(this);
-    this.applyCSSStyles = this.applyCSSStyles.bind(this);
+    this.applyCanvasCSSStyles = this.applyCanvasCSSStyles.bind(this);
     this.setClassName = this.setClassName.bind(this);
     this.state = {
       refresh: false
@@ -28,7 +32,7 @@ export class Canvas extends Component<CanvasPropsI, any> {
   }
 
   componentDidMount(): void {
-    const { width, height, name } = this.props;
+    const { width, height } = this.props;
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
@@ -39,9 +43,9 @@ export class Canvas extends Component<CanvasPropsI, any> {
       canvas: canvas
     };
     this.setClassName();
-    this.applyCSSStyles();
-    this.container.appendChild(canvas);
-
+    this.applyCanvasCSSStyles();
+    if (this.container) this.container.appendChild(canvas);
+    // reload since canvas was created
     this.forceUpdate();
   }
 
@@ -52,7 +56,10 @@ export class Canvas extends Component<CanvasPropsI, any> {
     }
   }
 
-  applyCSSStyles() {
+  /**
+   * applies passed style to the HTMLCanvasElement through the style tag
+   */
+  applyCanvasCSSStyles() {
     if (this.contextValue && this.props.style) {
       const styleString = Object.entries(this.props.style)
         .map(([cssAttr, cssValue]) => `${cssAttr}: ${cssValue};`)
@@ -78,7 +85,7 @@ export class Canvas extends Component<CanvasPropsI, any> {
     this.updateCanvas(prevProps, this.props);
   }
 
-  bindContainer(container: any) {
+  bindCanvasContainer(container: any) {
     this.container = container;
   }
 
@@ -96,13 +103,13 @@ export class Canvas extends Component<CanvasPropsI, any> {
       canvas.width = toProps.width;
       canvas.height = toProps.height;
     }
-    this.applyCSSStyles();
+    this.applyCanvasCSSStyles();
   }
 
   render() {
     return (
       <div
-        ref={this.bindContainer}
+        ref={this.bindCanvasContainer}
         className={`canvas-wrapper ${this.props.name}-canvas-wrapper`}
       >
         {this.contextValue ? (

@@ -21,6 +21,7 @@ export const CanvasContextConsumer = _CanvasContext.Consumer;
 
 export const withCanvasContext = <Props, Instance>(
   WrappedComponent: any
+  // TODO: Omit CanvasContext in more efficient way
 ): FC<Omit<Props, "ctx" | "canvas" | "clearCanvas">> => {
   const WithCanvasContextComponent = (props: any, ref: any) => (
     <CanvasContextConsumer>

@@ -28,14 +28,12 @@ function App() {
         }}
       >
         <RequestAnimationFrame>
-          {(time: number, clearAnimationFrame: () => void) => {
-            return (
-              <>
-                <AnimatedArc factor={1.2} />
-                <AnimatedArc factor={1} />
-              </>
-            );
-          }}
+          {(time: number, clearAnimationFrame: () => void) => (
+            <>
+              <AnimatedArc factor={1.2} />
+              <AnimatedArc factor={1} />
+            </>
+          )}
         </RequestAnimationFrame>
       </Canvas>
     </div>
